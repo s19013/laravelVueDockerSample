@@ -84,7 +84,6 @@ class TaskController extends Controller
             \Log::error($th);
             return response()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
         }
-
         return response()->json($task);
     }
 }
