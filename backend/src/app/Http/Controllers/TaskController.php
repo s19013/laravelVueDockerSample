@@ -35,10 +35,10 @@ class TaskController extends Controller
         } catch (\Throwable $th) {
             // 何かエラー発生したらログを残してエラーがおきたことを伝える
             \Log::error($th);
-            return redirect()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
+            return response()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
         }
 
-        return redirect()->json(['message' => '登録できました。']);
+        return response()->json(['message' => '登録できました。']);
 
     }
 
@@ -49,10 +49,10 @@ class TaskController extends Controller
         } catch (\Throwable $th) {
             // 何かエラー発生したらログを残してエラーがおきたことを伝える
             \Log::error($th);
-            return redirect()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
+            return response()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
         }
 
-        return redirect()->json(['message' => '編集できました。']);
+        return response()->json(['message' => '編集できました。']);
     }
 
     function done(Request $request) {
@@ -60,9 +60,9 @@ class TaskController extends Controller
             $this->taskRepository->done($request->id);
         } catch (\Throwable $th) {
             \Log::error($th);
-            return redirect()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
+            return response()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
         }
-        return redirect()->json(['message' => '完了しました']);
+        return response()->json(['message' => '完了しました']);
     }
 
     function destroy(Request $request) {
@@ -70,9 +70,20 @@ class TaskController extends Controller
             $this->taskRepository->destroy($request->id);
         } catch (\Throwable $th) {
             \Log::error($th);
-            return redirect()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
+            return response()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
         }
-        return redirect()->json(['message' => '削除しました']);
+        return response()->json(['message' => '削除しました']);
 
+    }
+
+    function getATaskData(Request $request) {
+        $task = null;
+        try {
+             $task = Task::find($request->id);
+        } catch (\Throwable $th) {
+            \Log::error($th);
+            return response()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
+        }
+        return response()->json($task);
     }
 }
