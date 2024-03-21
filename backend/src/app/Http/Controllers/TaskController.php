@@ -75,4 +75,16 @@ class TaskController extends Controller
         return response()->json(['message' => '削除しました']);
 
     }
+
+    function getATaskData(Request $request) {
+        $task = null;
+        try {
+             $task = Task::find($request->id);
+        } catch (\Throwable $th) {
+            \Log::error($th);
+            return response()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
+        }
+
+        return response()->json($task);
+    }
 }
