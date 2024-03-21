@@ -6,7 +6,13 @@ import {ref} from 'vue';
 
 <template>
     <div>
-        test hot
+        <router-link :to="{name:'create'}">
+            <button>新規</button>
+        </router-link>
+        <div>
+            <input type="text">
+            <button>検索</button>
+        </div>
     </div>
 </template>
 
