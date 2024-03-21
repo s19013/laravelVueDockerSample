@@ -6,7 +6,13 @@ import {ref} from 'vue';
 
 <template>
     <div>
-        create
+        <router-link :to="{name:'index'}">
+            <button>戻る</button>
+        </router-link>
+        <div>
+            <textarea />
+            <button>送信</button>
+        </div>
     </div>
 </template>
 
