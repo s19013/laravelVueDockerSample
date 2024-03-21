@@ -21,8 +21,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::prefix('/task')->group(function () {
     Route::get('/', [TaskController::class, 'index'])->name('task.index');
-    Route::post('/store', [TaskController::class, 'store'])->name('task.store');
-    Route::put('/update', [TaskController::class, 'update'])->name('task.update');
+    Route::post('/', [TaskController::class, 'store'])->name('task.store');
+    Route::put('/', [TaskController::class, 'update'])->name('task.update');
     Route::delete('/done', [TaskController::class, 'done'])->name('task.done');
     Route::delete('/', [TaskController::class, 'destroy'])->name('task.destroy');
 });
