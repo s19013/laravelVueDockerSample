@@ -25,14 +25,7 @@ class TaskController extends Controller
             $tasks = $this->taskRepository->searchIncompleteTask($attributes);
         }
 
-        return view('task.index')->with([
-            'tasks' =>$tasks
-        ]);
-
-    }
-
-    function create() {
-        return view('task.create');
+        return response()->json($tasks);
     }
 
     function store(CreateTaskRequest $request) {
@@ -42,17 +35,11 @@ class TaskController extends Controller
         } catch (\Throwable $th) {
             // 何かエラー発生したらログを残してエラーがおきたことを伝える
             \Log::error($th);
-            return redirect()->back()->withErrors(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'])->withInput();
+            return redirect()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
         }
 
-        return redirect()->route('task.index')->with('message', '登録できました。');
+        return redirect()->json(['message' => '登録できました。']);
 
-    }
-
-    function edit(Request $request) {
-        return view('task.edit')->with([
-            'task' => Task::find($request->id)
-        ]);
     }
 
     function update(Request $request) {
@@ -62,10 +49,10 @@ class TaskController extends Controller
         } catch (\Throwable $th) {
             // 何かエラー発生したらログを残してエラーがおきたことを伝える
             \Log::error($th);
-            return redirect()->back()->withErrors(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'])->withInput();
+            return redirect()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
         }
 
-        return redirect()->route('task.index')->with('message', '編集できました。');
+        return redirect()->json(['message' => '編集できました。']);
     }
 
     function done(Request $request) {
@@ -73,10 +60,9 @@ class TaskController extends Controller
             $this->taskRepository->done($request->id);
         } catch (\Throwable $th) {
             \Log::error($th);
-            dd($th);
-            return redirect()->back()->withErrors(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡']);
+            return redirect()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
         }
-        return redirect()->route('task.index')->with('message', '完了しました');
+        return redirect()->json(['message' => '完了しました']);
     }
 
     function destroy(Request $request) {
@@ -84,10 +70,9 @@ class TaskController extends Controller
             $this->taskRepository->destroy($request->id);
         } catch (\Throwable $th) {
             \Log::error($th);
-            dd($th);
-            return redirect()->back()->withErrors(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡']);
+            return redirect()->json(['message' => 'エラーが発生しました｡時間を置いて再度送信して下さい｡'],500);
         }
-        return redirect()->route('task.index')->with('message', '削除しました');
+        return redirect()->json(['message' => '削除しました']);
 
     }
 }
