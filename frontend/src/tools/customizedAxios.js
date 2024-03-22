@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const customizedAxios = axios.create({
-  baseURL: 'http://localhost:8000/api/task/',
+  baseURL: 'http://localhost:8000/api/task',
   withCredentials: true,
   headers: {
     'UserLang': window.navigator.language,
