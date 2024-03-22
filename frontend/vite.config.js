@@ -19,6 +19,12 @@ export default defineConfig({
     // --hostと同義,とりあえずこれでコンテナの外から通信できると思う?
     host: true,
     // 立ち上げる際のポートを変更できる。
-    port: 5173
+    port: 5173,
+
+    // ほっとリロード有効になるんだとか｡
+    // 後でviteの公式サイト見るなり確認するべき
+    watch: {
+      usePolling: true
+    }
   }
 })
