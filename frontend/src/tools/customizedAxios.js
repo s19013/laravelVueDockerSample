@@ -12,4 +12,4 @@ const customizedAxios = axios.create({
 export default customizedAxios
 
 // 以下の形でimportすること
-// import {customizedAxios as axios} from '@/tools/customizedAxios.js'
+// import {default as axios} from '@/tools/customizedAxios.js'
