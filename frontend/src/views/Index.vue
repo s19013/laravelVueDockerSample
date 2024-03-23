@@ -1,22 +1,30 @@
 <script setup>
 import {ref,reactive,onBeforeMount} from 'vue';
+import {useRoute,useRouter} from "vue-router";
+import {default as axios} from '@/tools/customizedAxios.js'
 import Task from '@/components/Task.vue'
 
-import {default as axios} from '@/tools/customizedAxios.js'
+const route = useRoute();
+const router = useRouter()
 
 let loading = ref(true)
 let tasks = ref(null)
+let keyword = ref('')
+
 onBeforeMount(() => {
+    console.log("onBeforeMount");
     axios
-    .get('/')
+    .get('/',{
+        params:{
+            keyword:route.query.keyword
+        }
+    })
     .then((response) => {
         tasks = ref(null)
         tasks.value = response.data
         loading.value = false
     })
     .catch((error) => {console.log(error);});
-
-    
 })
 
 const taskDone = async (id) => {
@@ -34,6 +42,11 @@ const leftOverTasks = (donedTaskId) => {
     return tasks.value.filter((task) => task.id !== donedTaskId)
 }
 
+const search = () => {
+    console.log("search");
+    router.push({name:'index',query: { keyword: keyword.value }})
+}
+
 </script>
 
 <template>
@@ -42,8 +55,8 @@ const leftOverTasks = (donedTaskId) => {
             <button>新規</button>
         </router-link>
         <div>
-            <input type="text">
-            <button>検索</button>
+            <input v-model="keyword" type="text">
+            <button @click="search">検索</button>
         </div>
 
         <p v-if="loading">読込中</p>
