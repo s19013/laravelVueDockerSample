@@ -1,5 +1,9 @@
 <script setup>
-import {ref,defineProps} from 'vue';
+import {ref,defineProps,defineEmits} from 'vue';
+const emit = defineEmits(['done'])
+const done = () => {
+    emit('done',props.task.id)
+}
 
 const props = defineProps({
     task:{
@@ -22,7 +26,7 @@ const props = defineProps({
         <router-link :to="'/edit/'+task.id">
             <button>編集</button>
         </router-link>
-        <button>完了</button>
+        <button @click="done">完了</button>
     </div>
 </template>
 
