@@ -23,7 +23,7 @@ Route::prefix('/task')->group(function () {
     Route::get('/', [TaskController::class, 'index'])->name('task.index');
     Route::get('/{id}', [TaskController::class, 'getATaskData'])->name('task.getATaskData');
     Route::post('/', [TaskController::class, 'store'])->name('task.store');
-    Route::put('/', [TaskController::class, 'update'])->name('task.update');
+    Route::put('/{id}', [TaskController::class, 'update'])->name('task.update');
     Route::delete('/done', [TaskController::class, 'done'])->name('task.done');
-    Route::delete('/', [TaskController::class, 'destroy'])->name('task.destroy');
+    Route::delete('/{id}', [TaskController::class, 'destroy'])->name('task.destroy');
 });
