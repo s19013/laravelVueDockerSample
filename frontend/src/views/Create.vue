@@ -35,7 +35,7 @@ const submit = async () => {
             <button>戻る</button>
         </router-link>
         <div>
-            <textarea  placeholder="タスク名" v-model="task_name"/>
+            <textarea  placeholder="タスク名" required v-model="task_name"/>
             <button @click="submit">送信</button>
         </div>
         <p v-if="sending">送信中</p>
