@@ -1,16 +1,16 @@
 <script setup>
 import {ref,reactive,onBeforeMount} from 'vue';
 import {default as axios} from '@/tools/customizedAxios.js'
-import {useRoute} from "vue-router";
+import {useRoute,useRouter} from "vue-router";
 
-const router = useRoute();
-
+const route = useRoute();
+const router = useRouter()
 let loading = ref(true)
 let sending = ref(false)
 
 let errorMessage = ref('')
 
-const id = ref(router.params['id']);
+const id = ref(route.params['id']);
 let task_name = ref('')
 
 onBeforeMount(() => {
@@ -41,6 +41,24 @@ const submit = async () => {
 
     sending.value=false
 }
+
+const destroy = async () => {
+    sending.value=true
+    errorMessage.value = ''
+
+    await axios
+    .delete('/' + id.value)
+    .then((response) => {
+        // 戻るボタンで戻って来れないようにするため
+        router.replace({name:'index'})
+    })
+    .catch((error) => {
+        console.log(error);
+        errorMessage = error.response.data.message
+    });
+
+    sending.value=false
+}
 </script>
 
 <template>
@@ -49,7 +67,7 @@ const submit = async () => {
             <button>戻る</button>
         </router-link>
         <div>
-            <textarea v-model="task_name"/>
+            <textarea required v-model="task_name"/>
             <button @click="submit">送信</button>
         </div>
 
@@ -57,7 +75,7 @@ const submit = async () => {
         <p v-if="sending">送信中</p>
         <p>{{ errorMessage }}</p>
 
-        <button>削除</button>
+        <button @click="destroy">削除</button>
     </div>
 </template>
 
