@@ -36,7 +36,7 @@ const submit = async () => {
     })
     .catch((error) => {
         console.log(error);
-        errorMessage = error.response.data.message
+        errorMessage.value = error.response.data.message
     });
 
     sending.value=false

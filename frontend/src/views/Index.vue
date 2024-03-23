@@ -1,22 +1,19 @@
 <script setup>
 import {ref,reactive,onBeforeMount} from 'vue';
+import {useRoute,useRouter} from "vue-router";
+import {default as axios} from '@/tools/customizedAxios.js'
 import Task from '@/components/Task.vue'
 
-import {default as axios} from '@/tools/customizedAxios.js'
+const route = useRoute();
+const router = useRouter()
 
 let loading = ref(true)
 let tasks = ref(null)
-onBeforeMount(() => {
-    axios
-    .get('/')
-    .then((response) => {
-        tasks = ref(null)
-        tasks.value = response.data
-        loading.value = false
-    })
-    .catch((error) => {console.log(error);});
+let keyword = ref('')
 
-    
+onBeforeMount(async () => {
+    keyword.value = route.query.keyword || ''; // URL のクエリパラメーターを取得
+    await search()
 })
 
 const taskDone = async (id) => {
@@ -34,6 +31,26 @@ const leftOverTasks = (donedTaskId) => {
     return tasks.value.filter((task) => task.id !== donedTaskId)
 }
 
+const search = async () => {
+    await axios
+    .get('/',{
+        params:{
+            keyword:keyword.value
+        }
+    })
+    .then((response) => {
+        tasks.value = response.data
+        loading.value = false
+    })
+    .catch((error) => {console.log(error);});
+}
+
+const submit = () => {
+    // urlを書き換える 他の人にurlを渡したりして再現できるようにするため?
+    router.push({name:'index',query: { keyword: keyword.value }})
+    search()
+}
+
 </script>
 
 <template>
@@ -42,8 +59,8 @@ const leftOverTasks = (donedTaskId) => {
             <button>新規</button>
         </router-link>
         <div>
-            <input type="text">
-            <button>検索</button>
+            <input v-model="keyword" type="text">
+            <button @click="submit">検索</button>
         </div>
 
         <p v-if="loading">読込中</p>
