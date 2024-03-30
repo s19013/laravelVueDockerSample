@@ -20,15 +20,9 @@ const taskDone = async (id) => {
     await axios
     .delete('/' + id)
     .then((response) => {
-        tasks.value = leftOverTasks(id)
+        setTasks(leftOverTasks(id))
     })
     .catch((error) => {console.log(error);});
-}
-
-// 完了したタスクを配列から消す
-// ->完了したタスク以外の要素を取ってくる
-const leftOverTasks = (donedTaskId) => {
-    return tasks.value.filter((task) => task.id !== donedTaskId)
 }
 
 const search = async () => {
@@ -39,8 +33,8 @@ const search = async () => {
         }
     })
     .then((response) => {
-        tasks.value = response.data
-        loading.value = false
+        setTasks(response.data)
+        LoadingCompleted()
     })
     .catch((error) => {console.log(error);});
 }
@@ -50,6 +44,18 @@ const submit = () => {
     router.push({name:'index',query: { keyword: keyword.value }})
     search()
 }
+
+const setTasks = (arg) => {
+    tasks.value = arg
+}
+
+// 完了したタスクを配列から消す
+// ->完了したタスク以外の要素を取ってくる
+const leftOverTasks = (donedTaskId) => {
+    return tasks.value.filter((task) => task.id !== donedTaskId)
+}
+
+const LoadingCompleted = () => { loading.value = false }
 
 </script>
 

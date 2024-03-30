@@ -12,20 +12,24 @@ let errorMessage = ref('')
 
 const submit = async () => {
     sending.value=true
-    errorMessage.value = ''
+    resetErrorMessage()
 
     await axios
     .post('/',{task_name:task_name.value})
     .then((response) => {
+        // ホーム画面に戻る
         router.push({name:'index'})
     })
     .catch((error) => {
         console.log(error);
-        errorMessage.value = error.response.data.message
+        setErrorMessage(error.response.data.message)
     });
 
     sending.value=false
 }
+
+const resetErrorMessage = () => {errorMessage.value = ''}
+const setErrorMessage = (message) => { errorMessage.value = message }
 </script>
 
 <template>
