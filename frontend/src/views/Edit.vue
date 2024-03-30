@@ -27,7 +27,7 @@ onBeforeMount(() => {
 
 const submit = async () => {
     sending.value=true
-    errorMessage.value = ''
+    resetErrorMessage()
 
     await axios
     .put('/' + id.value ,{task_name:task_name.value})
@@ -36,7 +36,7 @@ const submit = async () => {
     })
     .catch((error) => {
         console.log(error);
-        errorMessage.value = error.response.data.message
+        setErrorMessage(error.response.data.message)
     });
 
     sending.value=false
@@ -44,7 +44,7 @@ const submit = async () => {
 
 const destroy = async () => {
     sending.value=true
-    errorMessage.value = ''
+    resetErrorMessage()
 
     await axios
     .delete('/' + id.value)
@@ -54,11 +54,14 @@ const destroy = async () => {
     })
     .catch((error) => {
         console.log(error);
-        errorMessage.value = error.response.data.message
+        setErrorMessage(error.response.data.message)
     });
 
     sending.value=false
 }
+
+const resetErrorMessage = ()  => { errorMessage.value = '' }
+const setErrorMessage = (message) => { errorMessage.value = message }
 </script>
 
 <template>
