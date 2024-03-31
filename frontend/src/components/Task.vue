@@ -11,17 +11,21 @@ const props = defineProps({
         default:{
             id:0,
             task_name:'',
-            created_date:'',
+            created_at:'',
         }
     }
 })
+
+const created_at = (date) => {
+    return date.split("T")[0]
+}
 
 </script>
 
 <template>
     <div>
         <h3>{{ task.task_name }}</h3>
-        <p>{{ task.created_date }}</p>
+        <p>{{ created_at(task.created_at)}}</p>
 
         <router-link :to="'/edit/'+task.id">
             <button>編集</button>
