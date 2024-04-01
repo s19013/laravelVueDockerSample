@@ -11,6 +11,8 @@ let loading = ref(true)
 let tasks = ref(null)
 let keyword = ref('')
 
+defineExpose({tasks})
+
 onBeforeMount(async () => {
     keyword.value = route.query.keyword || ''; // URL のクエリパラメーターを取得
     await search()
