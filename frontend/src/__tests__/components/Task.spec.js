@@ -3,30 +3,43 @@ import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import Task from '@/components/Task.vue'
 
+import { createRouter, createWebHistory } from 'vue-router'
+import { routes } from "@/router" 
+
+const router = createRouter({
+    history: createWebHistory(),
+    routes: routes,
+  })
+
 // 使いまわし用の基本のprops
 const baseProps = {
-    props: { 
-        task:{
-            id:1,
-            task_name:'testTask',
-            created_at:'2024-03-23T0000', // Tで切り分けるようにしてるからTが必要
-        } 
-    }
+    task:{
+        id:1,
+        task_name:'testTask',
+        created_at:'2024-03-23T0000', // Tで切り分けるようにしてるからTが必要
+    } 
 }
 
+const baseWrapper = mount(Task,{
+    props:baseProps,
+    global: {
+      plugins: [router]
+    }
+})
+
 test('レンダリング', () => {
-    const wrapper = mount(Task,baseProps)
+    const wrapper = baseWrapper
     expect(wrapper.text()).toContain('testTask')
     expect(wrapper.text()).toContain('2024-03-23')
   })
 
 test('created_at',() => {
-    const wrapper = mount(Task,baseProps)
+    const wrapper = baseWrapper
     expect(wrapper.vm.created_at('2024-03-23T0000')).toBe('2024-03-23')
 })
 
 test('submit',() => {
-    const wrapper = mount(Task,baseProps)
+    const wrapper = baseWrapper
     const buttons = wrapper.findAll('button')
     // 見つけたボタンの中から完了ボタンを探す
     // textに完了って書いてるボタンを取得するとおもむろにそうなる
