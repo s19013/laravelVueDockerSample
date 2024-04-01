@@ -10,6 +10,12 @@ const router = createRouter({
     routes: routes,
   })
 
+  const baseWarpperOptions = {
+    global: {
+      plugins: [router]
+    }
+}
+
 const baseURL = 'http://localhost:8000/api/task'
 
 
@@ -25,11 +31,13 @@ test("とりあえず初期状態",async () => {
         }
     ]
 
+    // XXX:とりあえず動くけどよくわかってない
     // ライブラリを使った方法ならできた -> ただこのライブラリに依存することになる
     // axiosをモックする
     const mockedAxios = new MockAdapter(customizedAxios)
     mockedAxios.onGet(url).reply(200,mockedResponse)
 
+    // XXX:とりあえず動くけどよくわかってない
     vi.mock('vue-router', async () => {
         const route = await vi.importActual('vue-router')
       
@@ -52,14 +60,7 @@ test("とりあえず初期状態",async () => {
     // const response = await customizedAxios.get(baseURL + "/")
 
     // await router.isReady()
-    const wrapper = await mount(Index,
-        {
-            global: {
-                plugins: [router],
-                stubs: {RouterLink: RouterLinkStub},
-            },
-        }
-    )
+    const wrapper = await mount(Index,baseWarpperOptions)
 
     // BeforeMountでやってること再現しないとだめだってさ｡
     wrapper.vm.keyword = ''
@@ -71,5 +72,94 @@ test("とりあえず初期状態",async () => {
 
     // axiosで通信したデータが変数に入っているか
     expect(wrapper.vm.tasks).toContainEqual(mockedResponse[0]);
+
+})
+
+test('読込中メッセージ',async() => {
+    const url = baseURL + "/"
+
+    const mockedResponse = [
+        {
+            id:1,
+            task_name:'testTask',
+            created_at:'2024-03-23T0000'
+        }
+    ]
+
+    const mockedAxios = new MockAdapter(customizedAxios)
+    mockedAxios.onGet(url).reply(200,mockedResponse)
+
+    vi.mock('vue-router', async () => {
+        const route = await vi.importActual('vue-router')
+      
+        return { ...route, 
+            useRoute() {
+                return {
+                  route: "/",
+                  pathname: "",
+                  query: {keyword:""},
+                  asPath: "",
+                };
+              },
+        }
+    })
+
+    const wrapper = await mount(Index,baseWarpperOptions)
+
+    // NOTE:読込未完了状態を調べるためにわざとasyncをつけていない
+    wrapper.vm.search()
+
+    expect(wrapper.vm.loading).toBe(true)
+    expect(wrapper.text()).toContain("読込中")
+})
+
+test("task完了", async () => {
+    const url = baseURL + "/"
+
+    const mockedResponse = [
+        {
+            id:1,
+            task_name:'testTask',
+            created_at:'2024-03-23T0000'
+        },
+        {
+            id:2,
+            task_name:'testTask',
+            created_at:'2024-03-23T0000'
+        }
+    ]
+
+    const mockedAxios = new MockAdapter(customizedAxios)
+    mockedAxios.onGet(url).reply(200,mockedResponse)
+    mockedAxios.onDelete(url + mockedResponse[0].id).reply(200)
+
+    vi.mock('vue-router', async () => {
+        const route = await vi.importActual('vue-router')
+      
+        return { ...route, 
+            useRoute() {
+                return {
+                  route: "/",
+                  pathname: "",
+                  query: {keyword:""},
+                  asPath: "",
+                };
+              },
+        }
+    })
+
+    
+    const wrapper = await mount(Index,baseWarpperOptions)
+    wrapper.vm.keyword = ''
+    await wrapper.vm.search()
+
+    const buttons = wrapper.findAll('button')
+    const doneButton =buttons.filter(element => element.text() == "完了").at(0)
+
+    // NOTE:axios処理するから多分awaitが必要
+    await doneButton.trigger('click')
+
+    
+    expect(wrapper.vm.tasks.length).toBe(1)
 
 })
