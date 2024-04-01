@@ -15,21 +15,24 @@ const baseProps = {
     } 
 }
 
+// XXX:とりあえず動くけどよくわかってない
 // vue-routerの警告を消すために色々
 const router = createRouter({
     history: createWebHistory(),
     routes: routes,
   })
 
-const baseWrapper = mount(Task,{
+// XXX:とりあえず動くけどよくわかってない
+const baseWarpperOptions = {
     props:baseProps,
     global: {
       plugins: [router]
     }
-})
+}
+
 
 test('レンダリング', () => {
-    const wrapper = baseWrapper
+    const wrapper = mount(Task,baseWarpperOptions)
     const anker = wrapper.findAll('a')[0]
     expect(anker.html()).toContain(baseProps.task.id)
     expect(wrapper.text()).toContain('testTask')
@@ -37,12 +40,12 @@ test('レンダリング', () => {
   })
 
 test('created_at',() => {
-    const wrapper = baseWrapper
+    const wrapper = mount(Task,baseWarpperOptions)
     expect(wrapper.vm.created_at('2024-03-23T0000')).toBe('2024-03-23')
 })
 
 test('submit',() => {
-    const wrapper = baseWrapper
+    const wrapper = mount(Task,baseWarpperOptions)
     const buttons = wrapper.findAll('button')
     // 見つけたボタンの中から完了ボタンを探す
     // textに完了って書いてるボタンを取得するとおもむろにそうなる
