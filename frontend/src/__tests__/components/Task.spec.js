@@ -6,11 +6,6 @@ import Task from '@/components/Task.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from "@/router" 
 
-const router = createRouter({
-    history: createWebHistory(),
-    routes: routes,
-  })
-
 // 使いまわし用の基本のprops
 const baseProps = {
     task:{
@@ -19,6 +14,12 @@ const baseProps = {
         created_at:'2024-03-23T0000', // Tで切り分けるようにしてるからTが必要
     } 
 }
+
+// vue-routerの警告を消すために色々
+const router = createRouter({
+    history: createWebHistory(),
+    routes: routes,
+  })
 
 const baseWrapper = mount(Task,{
     props:baseProps,
