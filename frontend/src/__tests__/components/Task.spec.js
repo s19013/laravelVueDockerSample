@@ -29,6 +29,8 @@ const baseWrapper = mount(Task,{
 
 test('レンダリング', () => {
     const wrapper = baseWrapper
+    const anker = wrapper.findAll('a')[0]
+    expect(anker.html()).toContain(baseProps.task.id)
     expect(wrapper.text()).toContain('testTask')
     expect(wrapper.text()).toContain('2024-03-23')
   })
