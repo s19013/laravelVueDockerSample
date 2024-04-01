@@ -163,3 +163,43 @@ test("task完了", async () => {
     expect(wrapper.vm.tasks.length).toBe(1)
 
 })
+
+test('検索窓', async() => { 
+
+    const url = baseURL + "/"
+
+    // const mockedResponse = [
+    //     {
+    //         id:1,
+    //         task_name:'testTask',
+    //         created_at:'2024-03-23T0000'
+    //     }
+    // ]
+
+    // const mockedAxios = new MockAdapter(customizedAxios)
+    // mockedAxios.onGet(url).reply(200,mockedResponse)
+
+    vi.mock('vue-router', async () => {
+        const route = await vi.importActual('vue-router')
+      
+        return { ...route, 
+            useRoute() {
+                return {
+                  route: "/",
+                  pathname: "",
+                  query: {keyword:""},
+                  asPath: "",
+                };
+              },
+        }
+    })
+
+    const wrapper = await mount(Index,baseWarpperOptions)
+
+    const textInput = wrapper.find('input[type="text"]')
+    await textInput.setValue('test')
+
+    // 検索窓自体とmodelを確認
+    expect(textInput.element.value).toBe('test')
+    expect(wrapper.vm.keyword).toBe('test')
+ })
