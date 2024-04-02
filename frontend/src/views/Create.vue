@@ -10,6 +10,8 @@ let task_name = ref('')
 let sending =ref(false)
 let errorMessage = ref('')
 
+defineExpose({sending})
+
 const submit = async () => {
     sending.value=true
     resetErrorMessage()
@@ -21,8 +23,15 @@ const submit = async () => {
         router.push({name:'index'})
     })
     .catch((error) => {
-        console.log(error);
-        setErrorMessage(error.response.data.message)
+        // console.log(error);
+        
+        // ネットワークエラーと処理失敗は別物らしい
+        try {
+            setErrorMessage( error.response.data.message )
+        } catch (error) {
+            // ここに来たということは｡サーバーから送られたメッセージではないということ
+            setErrorMessage("エラーが発生しました｡時間を置いて再度送信して下さい｡")
+        }
     });
 
     sending.value=false
