@@ -10,8 +10,9 @@ const router = useRouter()
 let loading = ref(true)
 let tasks = ref(null)
 let keyword = ref('')
+let errorMessage = ref(null)
 
-defineExpose({tasks})
+defineExpose({tasks,loading,keyword})
 
 onBeforeMount(async () => {
     keyword.value = route.query.keyword || ''; // URL のクエリパラメーターを取得
@@ -19,15 +20,23 @@ onBeforeMount(async () => {
 })
 
 const taskDone = async (id) => {
+    resetErrorMessage()
     await axios
     .delete('/' + id)
-    .then((response) => {
+    .then(() => {
+        // エラーが帰ってこない -> 動作が正常に終了したということ
+        // レスポンスは特に無い
         setTasks(leftOverTasks(id))
     })
-    .catch((error) => {console.log(error);});
+    .catch((error) => {
+        // console.log(error);
+        setErrorMessage("通信エラーが発生しました｡時間を置いてもう一度送信してください")
+    });
 }
 
 const search = async () => {
+    nowLoading()
+    resetErrorMessage()
     await axios
     .get('/',{
         params:{
@@ -38,7 +47,10 @@ const search = async () => {
         setTasks(response.data)
         LoadingCompleted()
     })
-    .catch((error) => {console.log(error);});
+    .catch((error) => {
+        // console.log(error);
+        setErrorMessage("通信エラーが発生しました｡時間を置いてもう一度送信してください")
+    });
 }
 
 const submit = () => {
@@ -51,11 +63,21 @@ const setTasks = (arg) => {
     tasks.value = arg
 }
 
+const resetErrorMessage = () => {
+    errorMessage.value = null
+}
+
+const setErrorMessage = (message) => {
+    errorMessage.value = message
+}
+
 // 完了したタスクを配列から消す
 // ->完了したタスク以外の要素を取ってくる
 const leftOverTasks = (donedTaskId) => {
     return tasks.value.filter((task) => task.id !== donedTaskId)
 }
+
+const nowLoading = () => {loading.value = true}
 
 const LoadingCompleted = () => { loading.value = false }
 
@@ -63,6 +85,7 @@ const LoadingCompleted = () => { loading.value = false }
 
 <template>
     <div>
+        <p v-if="errorMessage">{{ errorMessage }}</p>
         <router-link :to="{name:'create'}">
             <button>新規</button>
         </router-link>
@@ -72,13 +95,13 @@ const LoadingCompleted = () => { loading.value = false }
         </div>
 
         <p v-if="loading">読込中</p>
-        <!-- <pre>
-            {{ tasks }}
-        </pre> -->
+        
         <br>
-        <template v-for="task of tasks" :key="task.id">
-            <Task :task="task" @done="taskDone"/>
-        </template>
+        <div v-if="!loading">
+            <template v-for="task of tasks" :key="task.id">
+                <Task :task="task" @done="taskDone"/>
+            </template>
+        </div>
     </div>
 </template>
 
