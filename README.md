@@ -31,3 +31,4 @@ vue Routerの大きな仕様変更により難しくなった｡
 * [Using-a-Real-Router](https://test-utils.vuejs.org/guide/advanced/vue-router#Using-a-Real-Router)
 * [wrapper](https://v1.test-utils.vuejs.org/ja/api/wrapper/)
 * [API Reference](https://test-utils.vuejs.org/api/)
+* [Asynchronous Behavior](https://test-utils.vuejs.org/guide/advanced/async-suspense.html)
