@@ -72,7 +72,7 @@ const setErrorMessage = (error) => {
     // ネットワークエラーと処理失敗は別物らしい
     try {
         errorMessage.value = error.response.data.message
-    } catch (error) {
+    } catch (innerError) {
         // ここに来たということは｡サーバーから送られたメッセージではないということ
         errorMessage.value = "エラーが発生しました｡時間を置いて再度送信して下さい｡"
     }
