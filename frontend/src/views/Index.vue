@@ -22,7 +22,7 @@ onBeforeMount(async () => {
 const taskDone = async (id) => {
     resetErrorMessage()
     await axios
-    .delete('/' + id)
+    .delete('/done/' + id)
     .then(() => {
         // エラーが帰ってこない -> 動作が正常に終了したということ
         // レスポンスは特に無い

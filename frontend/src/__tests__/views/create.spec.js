@@ -18,10 +18,6 @@ const router = createRouter({
 
 const baseURL = 'http://localhost:8000/api/task'
 
-// モデル連携
-// 送信中
-// エラー処理
-
 test('モデル連携',async() => {
 
     const wrapper = await mount(Create,baseWarpperOptions)

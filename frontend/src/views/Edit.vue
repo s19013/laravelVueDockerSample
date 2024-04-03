@@ -14,16 +14,23 @@ const id = ref(route.params['id']);
 let task_name = ref('')
 
 onBeforeMount(() => {
-    axios
+    getTaskData()
+})
+
+const getTaskData = async () => {
+    resetErrorMessage()
+    await axios
     .get('/' + id.value)
     .then((response) => {
         task_name.value = response.data.task_name
 
         loading.value = false
     })
-    .catch((error) => {console.log(error);});
-})
-
+    .catch((error) => {
+        // console.log(error);
+        setErrorMessage(error)
+    });
+}
 
 const submit = async () => {
     sending.value=true
@@ -35,8 +42,8 @@ const submit = async () => {
         router.push({name:'index'})
     })
     .catch((error) => {
-        console.log(error);
-        setErrorMessage(error.response.data.message)
+        // console.log(error);
+        setErrorMessage(error)
     });
 
     sending.value=false
@@ -53,15 +60,24 @@ const destroy = async () => {
         router.replace({name:'index'})
     })
     .catch((error) => {
-        console.log(error);
-        setErrorMessage(error.response.data.message)
+        // console.log(error);
+        setErrorMessage(error)
     });
 
     sending.value=false
 }
 
 const resetErrorMessage = ()  => { errorMessage.value = '' }
-const setErrorMessage = (message) => { errorMessage.value = message }
+const setErrorMessage = (error) => {
+    // ネットワークエラーと処理失敗は別物らしい
+    try {
+        errorMessage.value = error.response.data.message
+    } catch (error) {
+        // ここに来たということは｡サーバーから送られたメッセージではないということ
+        errorMessage.value = "エラーが発生しました｡時間を置いて再度送信して下さい｡"
+    }
+     
+}
 </script>
 
 <template>
