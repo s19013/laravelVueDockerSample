@@ -18,6 +18,7 @@ onBeforeMount(() => {
 })
 
 const getTaskData = async () => {
+    resetErrorMessage()
     await axios
     .get('/' + id.value)
     .then((response) => {
