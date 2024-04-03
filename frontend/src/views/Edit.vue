@@ -25,7 +25,10 @@ const getTaskData = async () => {
 
         loading.value = false
     })
-    .catch((error) => {console.log(error);});
+    .catch((error) => {
+        // console.log(error);
+        setErrorMessage(error)
+    });
 }
 
 const submit = async () => {
@@ -38,8 +41,8 @@ const submit = async () => {
         router.push({name:'index'})
     })
     .catch((error) => {
-        console.log(error);
-        setErrorMessage(error.response.data.message)
+        // console.log(error);
+        setErrorMessage(error)
     });
 
     sending.value=false
