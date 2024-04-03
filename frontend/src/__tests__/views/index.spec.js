@@ -39,6 +39,10 @@ test("とりあえず初期状態",async () => {
     mockedAxios.onGet(url).reply(200,mockedResponse)
 
     // XXX:とりあえず動くけどよくわかってない
+    // Vue Routerのセットアップは、テスト環境でコンポーネントがアプリケーション内での振る舞いを正確に模倣できるようにするために必要です。
+    // これにより、ルーティングに依存する機能（例えば、特定のルートパラメータを読み取る、またはナビゲーションを行う）を持つコンポーネントをテストする際に、
+    // Vue Routerに関連する警告が表示されることなく、より実際のアプリケーションの環境に近い形でテストを行うことができます。
+    // by coderabbitai
     vi.mock('vue-router', async () => {
         const route = await vi.importActual('vue-router')
       
