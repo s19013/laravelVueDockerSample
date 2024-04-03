@@ -137,7 +137,7 @@ test("task完了", async () => {
 
     const mockedAxios = new MockAdapter(customizedAxios)
     mockedAxios.onGet(url).reply(200,mockedResponse)
-    mockedAxios.onDelete(url + mockedResponse[0].id).reply(200)
+    mockedAxios.onDelete(url +"done/" + mockedResponse[0].id).reply(200)
 
     vi.mock('vue-router', async () => {
         const route = await vi.importActual('vue-router')
