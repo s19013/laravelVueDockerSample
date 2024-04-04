@@ -2,9 +2,35 @@ import { test, expect,chromium} from '@playwright/test';
 
 const apiBaseURL = 'http://localhost:8000/api/task'
 
-// 画面遷移
-//  新規
-//  編集
+// propsで使うやつまできっちりとってこような!!
+const mockedResponseJson =[{
+    id: 1, 
+    task_name: 'test_task_name',
+    deleted_at: null,
+    created_at: '2024-03-23T07:41:42.000000Z', 
+    updated_at: '2024-03-23T07:41:42.000000Z'
+}]
+
+test('データ表示',async({page}) => {
+    await page.route(apiBaseURL + "/" + "?keyword=", async route => {
+        await route.fulfill({
+            status:200,
+            body: JSON.stringify(mockedResponseJson),
+        });
+    });
+
+    await page.route(apiBaseURL + "/" + "?keyword=", async route => {
+        await route.fulfill({
+            status:200,
+            body: JSON.stringify(mockedResponseJson),
+        });
+    });
+
+    await page.goto('/')
+
+    await expect(page.getByText(mockedResponseJson[0].task_name)).toBeVisible();
+    await expect(page.getByText(mockedResponseJson[0].created_at.split("T")[0])).toBeVisible();
+})
 
 test('検索', async ({ page }) => {
     await page.goto('/');
@@ -33,14 +59,6 @@ test.describe('画面遷移', () => {
     })
 
     test('編集', async ({page}) => { 
-        // propsで使うやつまできっちりとってこような!!
-        const mockedResponseJson =[{
-            id: 1, 
-            task_name: 'test_task_name',
-            deleted_at: null,
-            created_at: '2024-03-23T07:41:42.000000Z', 
-            updated_at: '2024-03-23T07:41:42.000000Z'
-        }]
 
         // http://localhost:8000/api/task/?keyword=
         await page.route(apiBaseURL + "/" + "?keyword=", async route => {
@@ -50,13 +68,14 @@ test.describe('画面遷移', () => {
             });
         });
 
-        const [request, response] = await Promise.all([
-            page.waitForRequest(request => request.url().includes(apiBaseURL)),
-            page.waitForResponse(response => response.url().includes(apiBaseURL)),
-            page.goto('/')
-        ])
+        await page.goto('/')
 
-        await expect(page.getByText(mockedResponseJson[0].task_name)).toBeVisible();
+        // デバックで使ってたやつ
+        // const [request, response] = await Promise.all([
+        //     page.waitForRequest(request => request.url().includes(apiBaseURL)),
+        //     page.waitForResponse(response => response.url().includes(apiBaseURL)),
+        //     page.goto('/')
+        // ])
 
         // ボタンを推して画面遷移
         const button = page.getByRole('button',{name:'編集'})
