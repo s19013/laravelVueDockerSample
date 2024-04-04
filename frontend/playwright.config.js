@@ -40,17 +40,18 @@ export default defineConfig({
     trace: 'on-first-retry',
 
     /* Only on CI systems run the tests headless */
-    headless: !!process.env.CI
+    // headless: !!process.env.CI
+    headless: true
   },
 
   /* Configure projects for major browsers */
   projects: [
-    // {
-    //   name: 'chromium',
-    //   use: {
-    //     ...devices['Desktop Chrome']
-    //   }
-    // },
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome']
+      }
+    },
     // {
     //   name: 'firefox',
     //   use: {
@@ -85,12 +86,12 @@ export default defineConfig({
     //     channel: 'msedge',
     //   },
     // },
-    {
-      name: 'Google Chrome',
-      use: {
-        channel: 'chrome',
-      },
-    },
+    // {
+    //   name: 'Google Chrome',
+    //   use: {
+    //     channel: 'chrome',
+    //   },
+    // },
   ],
 
   /* Folder for test artifacts such as screenshots, videos, traces, etc. */
