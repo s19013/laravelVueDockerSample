@@ -64,13 +64,6 @@ test.describe('画面遷移', () => {
 
         await page.goto('/')
 
-        // デバックで使ってたやつ
-        // const [request, response] = await Promise.all([
-        //     page.waitForRequest(request => request.url().includes(apiBaseURL)),
-        //     page.waitForResponse(response => response.url().includes(apiBaseURL)),
-        //     page.goto('/')
-        // ])
-
         // ボタンを推して画面遷移
         const button = page.getByRole('button',{name:'編集'})
         await button.click()
