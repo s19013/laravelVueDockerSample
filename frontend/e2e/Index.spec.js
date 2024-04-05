@@ -34,6 +34,7 @@ test('検索', async ({ page }) => {
     const submit = await page.getByRole('button',{name:'検索'})
     await submit.click()
 
+    // urlにクエリがあるか
     const url = page.url()
     const regex = new RegExp('(?<=keyword=)(.*)')
     await expect(regex.test(url)).toBe(true)
