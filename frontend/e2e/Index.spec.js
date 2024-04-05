@@ -19,13 +19,6 @@ test('データ表示',async({page}) => {
         });
     });
 
-    await page.route(apiBaseURL + "/" + "?keyword=", async route => {
-        await route.fulfill({
-            status:200,
-            body: JSON.stringify(mockedResponseJson),
-        });
-    });
-
     await page.goto('/')
 
     await expect(page.getByText(mockedResponseJson[0].task_name)).toBeVisible();
