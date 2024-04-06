@@ -1,4 +1,4 @@
-import { test, expect,chromium} from '@playwright/test';
+import { test, expect} from '@playwright/test';
 
 const apiBaseURL = 'http://localhost:8000/api/task'
 
@@ -34,6 +34,7 @@ test('検索', async ({ page }) => {
     const submit = await page.getByRole('button',{name:'検索'})
     await submit.click()
 
+     // URLにクエリパラメータが含まれているかを確認
     const url = page.url()
     const regex = new RegExp('(?<=keyword=)(.*)')
     await expect(regex.test(url)).toBe(true)
@@ -62,13 +63,6 @@ test.describe('画面遷移', () => {
         });
 
         await page.goto('/')
-
-        // デバックで使ってたやつ
-        // const [request, response] = await Promise.all([
-        //     page.waitForRequest(request => request.url().includes(apiBaseURL)),
-        //     page.waitForResponse(response => response.url().includes(apiBaseURL)),
-        //     page.goto('/')
-        // ])
 
         // ボタンを推して画面遷移
         const button = page.getByRole('button',{name:'編集'})
