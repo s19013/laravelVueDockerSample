@@ -1,7 +1,8 @@
 const apiBaseURL = 'http://localhost:8000/api/task'
 // なくても良いかもだけどあるとわかりやすいと思うので作る
 
-export async function mockedResponse({page,url,status,body}) {
+// bodyがないレスポンスもあるから必須化しない
+export async function mockedResponse({page,url,status,body=''}) {
     await page.route(apiBaseURL + url, async route => {
         await route.fulfill({
             status:status,
