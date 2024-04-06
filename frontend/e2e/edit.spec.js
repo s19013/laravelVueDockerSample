@@ -1,4 +1,6 @@
 import { test, expect} from '@playwright/test';
+import { mockedResponse,mockedNetworkErrorResponse } from './testTool/mockApi';
+import { fillTextarea,clickButton } from './testTool/locator';
 
 const apiBaseURL = 'http://localhost:8000/api/task'
 
@@ -50,23 +52,12 @@ async function mockSubmitSucces(page){
     });
 }
 
-async function fillTextarea(page,value){
-    const textarea = await page.getByRole('textbox')
-    await textarea.fill(value)
-}
-
-async function clickSubmitButton(page){
-    const submit = await page.getByRole('button',{name:'送信'})
-    await submit.click()
-}
-
 // 条件:戻るボタンを押す
 // 期待:初期画面に戻る
 test('戻るボタン', async ({page}) => { 
     await page.goto('/edit/1')
 
-    const back = await page.getByRole('button',{name:'戻る'})
-    await back.click()
+    await clickButton({page:page,option:{name:'戻る'}})
 
     // 初期画面か
     const url = page.url()
@@ -99,11 +90,11 @@ test.describe('送信', () => {
 
         await page.goto('/edit/' + mockedTask.id)
 
-        await fillTextarea(page,newTaskName)
+        await fillTextarea({page:page,value:newTaskName})
 
         const [request] = await Promise.all([
             page.waitForRequest(request => request.url().includes(apiBaseURL)),
-            clickSubmitButton(page)
+            clickButton({page:page,option:{name:'送信'}})
         ])
 
         // jsonに変換されてるからオブジェクトに戻さないといけない
@@ -122,8 +113,8 @@ test.describe('送信', () => {
 
         await page.goto('/edit/' + mockedTask.id)
 
-        await fillTextarea(page,newTaskName)
-        await clickSubmitButton(page)
+        await fillTextarea({page:page,value:newTaskName})
+        await clickButton({page:page,option:{name:'送信'}})
 
         // ブラウザでもurlが書き換わるまでタイムラグがあるから少し待つ
         await page.waitForTimeout(1000);
@@ -174,7 +165,7 @@ test.describe("送信 エラー",() => {
 
         await mockServerError(page)
 
-        await clickSubmitButton(page)
+        await clickButton({page:page,option:{name:'送信'}})
 
         await expect(page.getByText('エラーが発生しました｡時間を置いて再度送信して下さい｡')).toBeVisible()
 
@@ -187,7 +178,7 @@ test.describe("送信 エラー",() => {
 
         await mockNetworkError(page)
 
-        await clickSubmitButton(page)
+        await clickButton({page:page,option:{name:'送信'}})
 
         await expect(page.getByText('エラーが発生しました｡時間を置いて再度送信して下さい｡')).toBeVisible()
     })
