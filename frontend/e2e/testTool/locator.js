@@ -8,6 +8,6 @@ export async function fillTextarea({page,value,option={}}){
 
 // optionは必須ではない
 export async function clickButton({page,option={}}) {
-    const button = page.getByRole('button',option)
+    const button = await page.getByRole('button',option)
     await button.click()
 }
