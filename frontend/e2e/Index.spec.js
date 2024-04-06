@@ -1,4 +1,6 @@
-import { test, expect} from '@playwright/test';
+import { test, expect } from '@playwright/test';
+import { mockedResponse,mockedNetworkErrorResponse } from './testTool/mockApi';
+import { fillTextarea,clickButton } from './testTool/locator';
 
 const apiBaseURL = 'http://localhost:8000/api/task'
 
@@ -13,46 +15,15 @@ const mockedTasks =[{
 
 const errorMessage = "通信エラーが発生しました｡時間を置いてもう一度送信してください"
 
-async function mockedResponse({page,status,body}) {
-    await page.route(apiBaseURL + "/" + "?keyword=", async route => {
-        await route.fulfill({
-            status:status,
-            body: body
-        });
-    });
-}
-
-async function mockedNormalResponse(page) {
-    await mockedResponse({
-        page:page,
-        status:200,
-        body:JSON.stringify(mockedTasks),
-    })
-}
-
-async function mockedServerErrorResponse(page) {
-    await mockedResponse({
-        page:page,
-        status:500,
-        body:JSON.stringify(errorMessage),
-    })
-}
-
-async function mockedNetworkErrorResponse(page) {
-    await page.route(apiBaseURL + "/" + "?keyword=", async route => {
-        await route.abort()
-    });
-}
-
-async function clickButton(page,buttonName) {
-    const button = page.getByRole('button',{name:buttonName})
-    await button.click()
-}
-
 // 条件:画面表示
 // 期待:api通信をしてデータを表示
 test('データ表示',async({page}) => {
-    await mockedNormalResponse(page)
+    await mockedResponse({
+        page:page,
+        url:"/?keyword=",
+        status:200,
+        body:mockedTasks,
+    })
 
     await page.goto('/')
 
@@ -67,7 +38,15 @@ test('検索', async ({ page }) => {
     const input = await page.getByRole('textbox')
     await input.fill('test');
 
-    await clickButton(page,"検索")
+    await fillTextarea({
+        page:page,
+        value:'test',
+    })
+
+    await clickButton({
+        page:page,
+        option:{name:"検索"}
+    })
 
      // URLにクエリパラメータが含まれているかを確認
     const url = page.url()
@@ -82,7 +61,10 @@ test.describe('画面遷移', () => {
     test('新規', async ({page}) => { 
         await page.goto('/');
 
-        await clickButton(page,"新規")
+        await clickButton({
+            page:page,
+            option:{name:"新規"}
+        })
 
         const url = page.url()
         await expect(url.includes('create')).toBe(true)
@@ -91,12 +73,20 @@ test.describe('画面遷移', () => {
     // 条件:編集ボタンを押す
     // 期待:編集画面へ遷移
     test('編集', async ({page}) => { 
-        await mockedNormalResponse(page)
+        await mockedResponse({
+            page:page,
+            url:"/?keyword=",
+            status:200,
+            body:mockedTasks,
+        })
 
         await page.goto('/')
 
         // ボタンを推して画面遷移
-        await clickButton(page,"編集")
+        await clickButton({
+            page:page,
+            option:{name:"編集"}
+        })
 
         const url = page.url()
         await expect(url.includes('edit/1')).toBe(true)
@@ -107,7 +97,13 @@ test.describe('エラー', () => {
     // 条件:api通信時に500エラーが帰ってくる
     // 期待:エラー文を表示
     test('サーバーエラー', async({page}) => { 
-        await mockedServerErrorResponse(page)
+        await mockedResponse({
+            page:page,
+            url:"/?keyword=",
+            status:500,
+            body:errorMessage,
+        })
+
         await page.goto('/')
         await expect(page.getByText(errorMessage)).toBeVisible();
      })
@@ -115,7 +111,11 @@ test.describe('エラー', () => {
     // 条件:api通信時にネットワークエラーが起きる
     // 期待:エラー文を表示
     test('ネットワークエラー', async({page}) => { 
-        await mockedNetworkErrorResponse(page)
+        await mockedNetworkErrorResponse({
+            page:page,
+            url:"/?keyword=",
+        })
+
         await page.goto('/')
         await expect(page.getByText(errorMessage)).toBeVisible();
      })
