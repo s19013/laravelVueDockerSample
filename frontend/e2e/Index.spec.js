@@ -11,13 +11,24 @@ const mockedResponseJson =[{
     updated_at: '2024-03-23T07:41:42.000000Z'
 }]
 
-test('データ表示',async({page}) => {
+async function mockedResponse(page) {
     await page.route(apiBaseURL + "/" + "?keyword=", async route => {
         await route.fulfill({
             status:200,
             body: JSON.stringify(mockedResponseJson),
         });
     });
+}
+
+async function clickButton(page,buttonName) {
+    const button = page.getByRole('button',{name:buttonName})
+    await button.click()
+}
+
+// 条件:画面表示
+// 期待:api通信をしてデータを表示
+test('データ表示',async({page}) => {
+    await mockedResponse(page)
 
     await page.goto('/')
 
@@ -25,14 +36,14 @@ test('データ表示',async({page}) => {
     await expect(page.getByText(mockedResponseJson[0].created_at.split("T")[0])).toBeVisible();
 })
 
+// 条件:inputに文字列を入れて送信
+// 期待:urlのクエリが追加されている
 test('検索', async ({ page }) => {
     await page.goto('/');
     const input = await page.getByRole('textbox')
-    await input.click()
     await input.fill('test');
-
-    const submit = await page.getByRole('button',{name:'検索'})
-    await submit.click()
+    
+    await clickButton(page,"検索")
 
      // URLにクエリパラメータが含まれているかを確認
     const url = page.url()
@@ -42,35 +53,30 @@ test('検索', async ({ page }) => {
 
 // playwrightはtest.describe
 test.describe('画面遷移', () => { 
+    // 条件:新規ボタンを押す
+    // 期待:新規画面へ遷移
     test('新規', async ({page}) => { 
         await page.goto('/');
 
-        const button = await page.getByRole('button',{name:'新規'})
-        await button.click()
+        await clickButton(page,"新規")
 
         const url = page.url()
         await expect(url.includes('create')).toBe(true)
     })
 
+    // 条件:編集ボタンを押す
+    // 期待:編集画面へ遷移
     test('編集', async ({page}) => { 
-
-        // http://localhost:8000/api/task/?keyword=
-        await page.route(apiBaseURL + "/" + "?keyword=", async route => {
-            await route.fulfill({
-                status:200,
-                body: JSON.stringify(mockedResponseJson),
-            });
-        });
+        await mockedResponse(page)
 
         await page.goto('/')
 
         // ボタンを推して画面遷移
-        const button = page.getByRole('button',{name:'編集'})
-        await button.click()
+        await clickButton(page,"編集")
 
         const url = page.url()
         await expect(url.includes('edit/1')).toBe(true)
     })
  })
 
- 
+// test('エラー', () => { second })
