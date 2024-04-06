@@ -1,24 +1,30 @@
 import { test, expect} from '@playwright/test';
+import { mockedResponse,mockedNetworkErrorResponse } from './testTool/mockApi';
+import { fillTextarea,clickButton } from './testTool/locator';
 
+
+const task_name = "testTask"
 const apiBaseURL = 'http://localhost:8000/api/task'
-
-
 
 test.describe('一通り動かす',() => { 
 
     // リクエストの中にtextareaの値が入っているか｡
     test('データがリクエストにはいっているか', async ({page}) => { 
         await page.goto('/create')
-        const task_name = "testTask"
         
         // textareaでもtextboxで取らないといけないらしい｡
-        const textarea = await page.getByRole('textbox')
-        await textarea.fill(task_name)
-        const submit = await page.getByRole('button',{name:'送信'})
+        await fillTextarea({
+            page:page,
+            value:task_name,
+        })
+        
 
         const [request] = await Promise.all([
             page.waitForRequest(request => request.url().includes(apiBaseURL)),
-            submit.click()
+            clickButton({
+                page:page,
+                option:{name:'送信'}
+            })
         ])
 
         // jsonに変換されてるからオブジェクトに戻さないといけない
@@ -33,18 +39,23 @@ test.describe('一通り動かす',() => {
         const task_name = "testTask"
         
         // textareaでもtextboxで取らないといけないらしい｡
-        const textarea = await page.getByRole('textbox')
-        await textarea.fill(task_name)
+        await fillTextarea({
+            page:page,
+            value:task_name,
+        })
 
         // 送信したら必ず200を返すようにする
-        await page.route(apiBaseURL + "/", async route => {
-            await route.fulfill({
-                status:200,
-            });
-        });
+        await mockedResponse({
+            page:page,
+            url:"/",
+            status:200
+        })
 
-        const submit = await page.getByRole('button',{name:'送信'})
-        await submit.click()
+
+        await clickButton({
+            page:page,
+            option:{name:'送信'}
+        })
 
         // ブラウザでもurlが書き換わるまでタイムラグがあるから少し待つ
         await page.waitForTimeout(1000);
@@ -66,8 +77,10 @@ test.describe('一通り動かす',() => {
 test('戻るボタン', async ({page}) => { 
     await page.goto('/create')
 
-    const back = await page.getByRole('button',{name:'戻る'})
-    await back.click()
+    await clickButton({
+        page:page,
+        option:{name:'戻る'}
+    })
 
     // 初期画面か
     const url = page.url()
@@ -79,28 +92,65 @@ test('戻るボタン', async ({page}) => {
     await expect(page.getByRole('button',{name:'新規'})).toBeVisible()
  })
 
-test('通信エラー', async({page}) => { 
-    await page.goto('/create')
-    const task_name = "testTask"
+ test.describe('通信エラー', () => {
+    test('サーバーエラー', async({page}) => { 
+        await page.goto('/create')
+        const task_name = "testTask"
+        
+        await fillTextarea({
+            page:page,
+            value:task_name,
+        })
     
-    // textareaでもtextboxで取らないといけないらしい｡
-    const textarea = await page.getByRole('textbox')
-    await textarea.fill(task_name)
+        
+        // サーバーエラーを起こす
+        await mockedResponse({
+            page:page,
+            url:"/",
+            status:500,
+            body:{message:'エラーが発生しました｡時間を置いて再度送信して下さい｡'}
+        })
+    
+        await clickButton({
+            page:page,
+            option:{name:'送信'}
+        })
+    
+        // api通信が終わるまで待つ
+        await page.waitForTimeout(1000);
+    
+        await expect(page.getByText('エラーが発生しました｡時間を置いて再度送信して下さい｡')).toBeVisible()
+     })
 
-    // ネットワークエラーを起こす
-    await page.route(apiBaseURL + "/", async route => {
-        await route.abort();
-    });
+    test('ネットワークエラー', async({page}) => { 
+        await page.goto('/create')
+        const task_name = "testTask"
+        
+        // textareaでもtextboxで取らないといけないらしい｡
+        
+        await fillTextarea({
+            page:page,
+            value:task_name,
+        })
+    
+        // ネットワークエラーを起こす
+        await mockedNetworkErrorResponse({
+            page:page,
+            url:"/"
+        })
+    
+        await clickButton({
+            page:page,
+            option:{name:'送信'}
+        })
+    
+        // api通信が終わるまで待つ
+        await page.waitForTimeout(1000);
+    
+        await expect(page.getByText('エラーが発生しました｡時間を置いて再度送信して下さい｡')).toBeVisible()
+     })
+})
 
-    const submit = await page.getByRole('button',{name:'送信'})
-    await submit.click()
-
-    // api通信が終わるまで待つ
-    await page.waitForTimeout(1000);
-
-    // index画面には以下のボタンがあるはずなので確かめる
-    await expect(page.getByText('エラーが発生しました｡時間を置いて再度送信して下さい｡')).toBeVisible()
- })
 
  //  うまくいかないが｡ここだけ手動でやればよいだろ｡
 //  test('送信中', async ({page}) => { 

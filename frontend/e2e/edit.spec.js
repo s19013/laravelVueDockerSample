@@ -1,4 +1,6 @@
 import { test, expect} from '@playwright/test';
+import { mockedResponse,mockedNetworkErrorResponse } from './testTool/mockApi';
+import { fillTextarea,clickButton } from './testTool/locator';
 
 const apiBaseURL = 'http://localhost:8000/api/task'
 
@@ -12,52 +14,13 @@ const mockedTask = {
 
 const newTaskName = "editedTask"
 
-
-// 通信エラー
-    // 送信
-        // 500
-        // ネットワーク
-
-async function mockTaskResponse(page) {
-    await page.route(apiBaseURL + "/" + mockedTask.id , async route => {
-        await route.fulfill({
-            status:200,
-            body: JSON.stringify(mockedTask),
-        });
-    });
-}
-
-async function mockServerError(page){
-    await page.route(apiBaseURL + "/" + mockedTask.id, async route => {
-        await route.fulfill({
-            status:500,
-            body:JSON.stringify({message:"エラーが発生しました｡時間を置いて再度送信して下さい｡"}),
-        });
-    });
-}
-
-async function mockNetworkError(page){
-    await page.route(apiBaseURL + "/" + mockedTask.id, async route => {
-        await route.abort()
-    });
-}
-
-async function mockSubmitSucces(page){
-    await page.route(apiBaseURL + "/" + mockedTask.id, async route => {
-        await route.fulfill({
-            status:200,
-        });
-    });
-}
-
-async function fillTextarea(page,value){
-    const textarea = await page.getByRole('textbox')
-    await textarea.fill(value)
-}
-
-async function clickSubmitButton(page){
-    const submit = await page.getByRole('button',{name:'送信'})
-    await submit.click()
+async function mockGetTask(page) {
+    await mockedResponse({
+        page:page,
+        url:"/" + mockedTask.id ,
+        status:200,
+        body:mockedTask
+    })
 }
 
 // 条件:戻るボタンを押す
@@ -65,8 +28,7 @@ async function clickSubmitButton(page){
 test('戻るボタン', async ({page}) => { 
     await page.goto('/edit/1')
 
-    const back = await page.getByRole('button',{name:'戻る'})
-    await back.click()
+    await clickButton({page:page,option:{name:'戻る'}})
 
     // 初期画面か
     const url = page.url()
@@ -81,7 +43,7 @@ test('戻るボタン', async ({page}) => {
 // 条件:画面を表示
 // 期待:api通信でデータを取得し､データを表示
 test('データ読み込み', async({page}) => {
-    await mockTaskResponse(page)
+    await mockGetTask(page)
 
     await page.goto('/edit/' + mockedTask.id)
 
@@ -94,16 +56,23 @@ test('データ読み込み', async({page}) => {
 test.describe('送信', () => {
     // 期待:リクエストにtextareaの値があるか｡
     test('リクエストにデータがあるか', async({page}) => { 
-        await mockTaskResponse(page)
-        await mockSubmitSucces(page)
+        await mockGetTask(page)
 
         await page.goto('/edit/' + mockedTask.id)
 
-        await fillTextarea(page,newTaskName)
+        await fillTextarea({page:page,value:newTaskName})
+
+        // 次のモックが前のモックと混ざらないように消す｡
+        await page.unrouteAll();
+        await mockedResponse({
+            page:page,
+            url:"/" + mockedTask.id ,
+            status:200,
+        })
 
         const [request] = await Promise.all([
             page.waitForRequest(request => request.url().includes(apiBaseURL)),
-            clickSubmitButton(page)
+            clickButton({page:page,option:{name:'送信'}})
         ])
 
         // jsonに変換されてるからオブジェクトに戻さないといけない
@@ -117,13 +86,20 @@ test.describe('送信', () => {
      // 期待:初期画面に戻ったか｡
      test('画面遷移', async({page}) => { 
 
-        await mockTaskResponse(page)
-        await mockSubmitSucces(page)
+        await mockGetTask(page)
 
         await page.goto('/edit/' + mockedTask.id)
 
-        await fillTextarea(page,newTaskName)
-        await clickSubmitButton(page)
+        await fillTextarea({page:page,value:newTaskName})
+
+        await page.unrouteAll();
+        await mockedResponse({
+            page:page,
+            url:"/" + mockedTask.id ,
+            status:200,
+        })
+
+        await clickButton({page:page,option:{name:'送信'}})
 
         // ブラウザでもurlが書き換わるまでタイムラグがあるから少し待つ
         await page.waitForTimeout(1000);
@@ -143,7 +119,13 @@ test.describe('送信', () => {
 test.describe("データ取得 エラー",() => {
     test('サーバーエラー', async ({page}) => { 
 
-        await mockServerError(page)
+        await mockedResponse({
+            page:page,
+            url:"/" + mockedTask.id ,
+            status:500,
+            body:{message:"エラーが発生しました｡時間を置いて再度送信して下さい｡"}
+        })
+
         await page.goto('/edit/' + mockedTask.id)
 
         // api通信が終わるまで待つ
@@ -155,7 +137,10 @@ test.describe("データ取得 エラー",() => {
      })
 
      test('ネットワークエラー', async ({page}) => { 
-        await mockNetworkError(page)
+        await mockedNetworkErrorResponse({
+            page:page,
+            url:"/" + mockGetTask.id
+        })
         await page.goto('/edit/' + mockedTask.id)
 
         // api通信が終わるまで待つ
@@ -168,26 +153,34 @@ test.describe("データ取得 エラー",() => {
 
 test.describe("送信 エラー",() => {
     test('サーバーエラー', async({page}) => { 
-        await mockTaskResponse(page)
+        await mockGetTask(page)
 
         await page.goto('/edit/' + mockedTask.id)
 
-        await mockServerError(page)
+        await mockedResponse({
+            page:page,
+            url:"/" + mockedTask.id ,
+            status:500,
+            body:{message:"エラーが発生しました｡時間を置いて再度送信して下さい｡"}
+        })
 
-        await clickSubmitButton(page)
+        await clickButton({page:page,option:{name:'送信'}})
 
         await expect(page.getByText('エラーが発生しました｡時間を置いて再度送信して下さい｡')).toBeVisible()
 
      })
 
      test('ネットワークエラー', async({page}) => { 
-        await mockTaskResponse(page)
+        await mockGetTask(page)
 
         await page.goto('/edit/' + mockedTask.id)
 
-        await mockNetworkError(page)
+        await mockedNetworkErrorResponse({
+            page:page,
+            url:"/" + mockedTask.id
+        })
 
-        await clickSubmitButton(page)
+        await clickButton({page:page,option:{name:'送信'}})
 
         await expect(page.getByText('エラーが発生しました｡時間を置いて再度送信して下さい｡')).toBeVisible()
     })
