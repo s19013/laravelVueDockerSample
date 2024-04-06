@@ -1,10 +1,8 @@
-import { test, expect,chromium} from '@playwright/test';
+import { test, expect} from '@playwright/test';
 
 const apiBaseURL = 'http://localhost:8000/api/task'
 
-async function commonSetup(page) {
-    
-}
+
 
 test.describe('一通り動かす',() => { 
 

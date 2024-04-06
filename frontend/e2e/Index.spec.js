@@ -1,4 +1,4 @@
-import { test, expect,chromium} from '@playwright/test';
+import { test, expect} from '@playwright/test';
 
 const apiBaseURL = 'http://localhost:8000/api/task'
 
@@ -34,7 +34,7 @@ test('検索', async ({ page }) => {
     const submit = await page.getByRole('button',{name:'検索'})
     await submit.click()
 
-    // urlにクエリがあるか
+     // URLにクエリパラメータが含まれているかを確認
     const url = page.url()
     const regex = new RegExp('(?<=keyword=)(.*)')
     await expect(regex.test(url)).toBe(true)
