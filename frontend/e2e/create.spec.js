@@ -24,7 +24,7 @@ test.describe('一通り動かす',() => {
         // jsonに変換されてるからオブジェクトに戻さないといけない
         const postData = JSON.parse(request.postData())
 
-        expect('task_name' in postData)
+        await expect('task_name' in postData).toBe(true)
         await expect(postData.task_name).toBe("testTask")
      })
 
@@ -52,8 +52,8 @@ test.describe('一通り動かす',() => {
         // 初期画面か
         const url = page.url()
         // index画面である -> 編集画面でも､新規画面でもない
-        await expect(url.includes('edit')).toBe(false)
-        await expect(url.includes('create')).toBe(false)
+        await expect(url).not.toContain('edit')
+        await expect(url).not.toContain('create')
 
         // index画面には以下のボタンがあるはずなので確かめる
         await expect(page.getByRole('button',{name:'新規'})).toBeVisible()
