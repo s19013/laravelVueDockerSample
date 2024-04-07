@@ -5,13 +5,15 @@ import { fillTextarea,clickButton } from './testTool/locator';
 const apiBaseURL = 'http://localhost:8000/api/task'
 
 // propsで使うやつまできっちりとってこような!!
-const mockedTasks =[{
-    id: 1, 
-    task_name: 'test_task_name',
-    deleted_at: null,
-    created_at: '2024-03-23T07:41:42.000000Z', 
-    updated_at: '2024-03-23T07:41:42.000000Z'
-}]
+const mockedTasks =[
+    {
+        id: 1, 
+        task_name: 'test_task_name',
+        deleted_at: null,
+        created_at: '2024-03-23T07:41:42.000000Z', 
+        updated_at: '2024-03-23T07:41:42.000000Z'
+    }
+]
 
 const errorMessage = "通信エラーが発生しました｡時間を置いてもう一度送信してください"
 
@@ -119,4 +121,37 @@ test.describe('エラー', () => {
         await page.goto('/')
         await expect(page.getByText(errorMessage)).toBeVisible();
      })
+ })
+
+//  条件:指定したタスク完了ボタンを押す
+//  期待:指定したタスクが画面に表示されない
+test('タスク完了', async({page}) => { 
+    await mockedResponse({
+        page:page,
+        url:"/?keyword=",
+        status:200,
+        body:mockedTasks,
+    })
+
+    // タスク完了apiのモック
+    await mockedResponse({
+        page:page,
+        url:"/done/" + mockedTasks[0].id,
+        status:200,
+    })
+
+    await page.goto('/');
+
+    // タスク完了ボタンを押す
+    await clickButton({
+        page:page,
+        option:{name:"完了"}
+    })
+
+    // apiが終わるまで待つ
+    await page.waitForTimeout(1000);
+
+    // タスクが画面から消える
+    await expect(page.getByText(mockedTasks[0].task_name)).not.toBeVisible();
+    await expect(page.getByText(mockedTasks[0].created_at.split("T")[0])).not.toBeVisible();
  })
