@@ -24,7 +24,8 @@ export default defineConfig({
     // ポーリングを使用してファイルの変更を監視し、ホットリロードを有効にします。
     // 後でviteの公式サイト見るなり確認するべき
     watch: {
-      usePolling: true
+      usePolling: true,
+      interval: 1000 //インターバルを長くして負荷を抑える
     }
   }
 })
