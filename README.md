@@ -17,6 +17,12 @@ vue Routerの大きな仕様変更により実装が難しくなったため断�
 自分が使っているaxiosはカスタマイズしたやつなのでネットに乗ってる方法でやるのは難しいもよう｡  
 このライブラリを使ってカスタマイズしたaxiosをモックしている
 
+# 駄文
+フロントエンドのテストに苦戦した｡  
+-> モックがわからない､マウントがわからないなど｡  
+
+vue routerでは今のurlのクエリをつけてpushしてもurlを書き換えるだけだという仕様を今回の実装で初めて知った｡
+
 # 参考サイト
 ## javascript
 * [JavaScriptで特定の文字列が含まれているか調べるメソッドの使い方](https://qiita.com/shimajiri/items/a2d79d9aa1323da972f3)
@@ -25,11 +31,17 @@ vue Routerの大きな仕様変更により実装が難しくなったため断�
 * [jsでのプロパティの存在チェック方法をまとめてみる](https://qiita.com/rymiyamoto/items/be91b04f70de2b621bb3)
 * [RegExp.prototype.test()](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/RegExp/test)
 * [JSON.stringify()](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
+* [URLSearchParams](https://developer.mozilla.org/ja/docs/Web/API/URLSearchParams)
 
 ## laravel
 [Docker+Nginx+MySQLでLaravelの開発環境構築](https://entreprogrammer.jp/laravel-nginx-docker/)
 
+## vue router
+* [API リファレンス](https://v3.router.vuejs.org/ja/api/)
+* [Vue.jsのVue Routerを使用してプログラムで画面遷移する方法！](https://codelikes.com/use-vue-router/)
+
 ## vitest
+* [Vitestのテストで使えるマッチャー一覧](https://qiita.com/mori_goq/items/f9dfe1875befe1e6283b)
 * [Jestでデフォルト値設定済みのaxiosインスタンスに対するMockテスト](https://qiita.com/clomie/items/ccf8977a7724f81eff12)
 * [Nuxt3でのVue Test Utilsでのvmがの中身が{}（空）の件](https://zenn.dev/tmo_taka/articles/91e040c081046a)
 * [コードで理解。jest.mock()、jest.spyOn()、jest.fn()の違い。](https://qiita.com/TMDM/items/bc6940fc2ed4a67fe4ff)
@@ -45,10 +57,14 @@ vue Routerの大きな仕様変更により実装が難しくなったため断�
 * [Next/RouterのMock - Vitest](https://zenn.dev/renoa/articles/vitest-next-router-mock)
 * [Nuxt3でのVue Test Utilsでのvmがの中身が{}（空）の件](https://zenn.dev/tmo_taka/articles/91e040c081046a)
 * [Vitest と呼ばれるテスティングフレームワークがめちゃくちゃ早いらしいな](https://azukiazusa.dev/blog/testingframework-vitest/)
+* [Vue/Jestテストのハマりどころ３選!!](https://tech-blog.rakus.co.jp/entry/20200206/vue-js/jest/software-test)
 * [expect](https://vitest.dev/api/expect)
 * [vi](https://vitest.dev/api/vi)
 * [mock functions](https://vitest.dev/api/mock)
 * [モック関数](https://jestjs.io/ja/docs/next/mock-functions)
+* [assert](https://vitest.dev/api/assert.html)
+* [Test API Reference](https://vitest.dev/api/)
+* [Configuring Vitest](https://vitest.dev/config/)
 
 
 ## vue test utils
@@ -64,6 +80,8 @@ vue Routerの大きな仕様変更により実装が難しくなったため断�
 * [Testing Vue Router](https://test-utils.vuejs.org/guide/advanced/vue-router.html)
 * [Making HTTP requests](https://test-utils.vuejs.org/guide/advanced/http-requests.html)
 * [Asynchronous Behavior](https://test-utils.vuejs.org/guide/advanced/async-suspense.html)
+* [setValue(value)](https://v1.test-utils.vuejs.org/ja/api/wrapper/setvalue.html)
+* [Wrapper](https://v1.test-utils.vuejs.org/ja/api/wrapper/)
 
 ## playwright
 * [playwright（Node.js） で E2E テスト！](https://zenn.dev/ryoka419319/articles/428ecee482a8ea)
@@ -98,3 +116,14 @@ vue Routerの大きな仕様変更により実装が難しくなったため断�
 * [APIRequestContext](https://playwright.dev/docs/api/class-apirequestcontext)
 * [Route](https://playwright.dev/docs/api/class-route)
 * [Input](https://www.cuketest.com/playwright/docs/input/)
+
+## docker
+* [Docker Composeでビルド時に任意のイメージ名を指定する方法](https://amaya382.hatenablog.jp/entry/2017/04/03/034002)
+* [【Docker】初心者のための Docker Compose まとめ](https://ai-can-fly.hateblo.jp/entry/summary-of-docker-compose-for-beginner)
+* [Dockerコンテナ内でnpmコマンドがやたらと遅い時にやってみること](https://zenn.dev/nsystk/articles/77d77737e82853)
+* [Docker + Viteな環境でホットリロードが効かない時の対策](https://zenn.dev/hctaw_srp/articles/1f7f67de03d710)
+
+## その他
+* [「No 'Access-Control-Allow-Origin'」が出た時に疑うこと・解決策リスト](https://qiita.com/yusuke5/items/27443c69f9c37ba53e7c)
+* [VSCodeでgitStashを使ってみる](https://qiita.com/ken0426/items/b665b7d5ece7ef7b0069)
+* [cors](https://developer.mozilla.org/ja/docs/Glossary/CORS)
