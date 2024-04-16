@@ -7,4 +7,4 @@ COPY . /frontend
 run apt-get update
 run yarn install
 # run npm install
-# CMD ["yarn", "dev"]
+CMD ["yarn", "dev"]
