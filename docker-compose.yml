@@ -31,13 +31,11 @@ services:
   #     - ./frontend:/frontend
   #     - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
   db:
-    image: mysql:8.0.34
+    image: mysql:8.3.0
     ports:
       - 3306:3306
-    environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      TZ: Asia/Tokyo
+    env_file:
+      - ./backend/src/.env
     volumes:
       - mysql:/var/lib/mysql
       - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
@@ -45,11 +43,8 @@ services:
     image: phpmyadmin
     depends_on:
       - db
-    environment:
-      - PMA_ARBITRARY=1
-      - PMA_HOSTS=db
-      - PMA_USER=${PMA_USER}
-      - PMA_PASSWORD=${PMA_PASSWORD}
+    env_file:
+      - ./backend/src/.env
     ports:
       - "3001:80"
 volumes:
